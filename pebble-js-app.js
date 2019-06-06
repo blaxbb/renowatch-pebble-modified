@@ -3,7 +3,7 @@
 // Register for an API Key here https://darksky.net/dev
 //
 //
-var API_KEY = "SECRETKEYHERE";
+var API_KEY = "a221751ca06f63c8e58802fe7a26f3af";
 //
 //
 //
@@ -48,7 +48,7 @@ if (options === null) options = { "use_gps" : "true",
 function getWeatherFromLatLong(latitude, longitude) {
   console.log(latitude + ", " + longitude);
   var forecastReq = new XMLHttpRequest();
-  var forecastUrl = "https://api.darksky.net/forecast/" + API_KEY + "/" + latitude + "," + longitude;
+  var forecastUrl = "https://api.darksky.net/forecast/" + API_KEY + "/" + latitude + "," + longitude + "?units=si";
   forecastReq.open('GET', forecastUrl, true);
   forecastReq.onload = function(e)
   {
