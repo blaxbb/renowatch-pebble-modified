@@ -48,7 +48,10 @@ if (options === null) options = { "use_gps" : "true",
 function getWeatherFromLatLong(latitude, longitude) {
   console.log(latitude + ", " + longitude);
   var forecastReq = new XMLHttpRequest();
-  var forecastUrl = "https://api.darksky.net/forecast/" + API_KEY + "/" + latitude + "," + longitude;
+  var unitsCode = "auto"
+  if (options.units == "fahrenheit") unitsCode = "us"
+  else if (options.units == "celsius") unitsCode = "si"
+  var forecastUrl = "https://api.darksky.net/forecast/" + API_KEY + "/" + latitude + "," + longitude + "?units=" + unitsCode;
   forecastReq.open('GET', forecastUrl, true);
   forecastReq.onload = function(e)
   {
