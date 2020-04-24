@@ -10,6 +10,13 @@ var API_KEY = "SECRETKEYHERE";
 //
 //
 
+// thresholds for considering the weather "cold" if otherwise clear
+var COLD_C = 0
+var COLD_F = 32
+//thresholds for considering the weather "windy" if otherwise clear
+var WIND_MS = 8.9
+var WIND_MPH = 20
+
 var CLEAR_DAY = 0;
 var CLEAR_NIGHT = 1;
 var WINDY = 2;
@@ -25,7 +32,7 @@ var CLOUDY = 11;
 var STORM = 12;
 var NA = 13;
 
-function getIcon(id, dayBool)
+function getIcon(id, dayBool, temp, wind)
 {
 	var category = id[0];
 	
@@ -42,6 +49,15 @@ function getIcon(id, dayBool)
 		case "8":
 			if(id == "800")
 			{
+				if (options.units == "fahrenheit" && wind > WIND_MPH)
+					return WINDY;
+				else if (options.units == "celsius" && wind > WIND_MS)
+					return WINDY;
+				if (options.units == "fahrenheit" && temp < COLD_F)
+					return COLD;
+				else if (options.units == "celsius" && temp < COLD_C)
+					return COLD;
+				
 				return (dayBool ? CLEAR_DAY : CLEAR_NIGHT);
 			}
 			if(id == "801" || id == "802")
@@ -91,13 +107,15 @@ function getWeatherForecastIO(data)
 	console.log("TEMP: " + temp);
 	console.log(data.weather[0].id);
 	
+	var wind = data.wind.speed;
+	
 	var time = data.dt;
 	var sunrise = data.sys.sunrise;
 	var sunset = data.sys.sunset;
 	
 	var dayBool = time > sunrise && time < sunset;
 	
-	var icon = getIcon(data.weather[0].id.toString(), dayBool);
+	var icon = getIcon(data.weather[0].id.toString(), dayBool, temp, wind);
 	Pebble.sendAppMessage({
 		"icon" : icon,
 		"temperature" : Math.round(temp) + "\u00B0",
