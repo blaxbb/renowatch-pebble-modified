@@ -1,6 +1,6 @@
 //
 //
-// Register for an API Key here https://darksky.net/dev
+// Register for an API Key here https://openweathermap.org/api
 //
 //
 var API_KEY = "SECRETKEYHERE";
@@ -25,17 +25,32 @@ var CLOUDY = 11;
 var STORM = 12;
 var NA = 13;
 
-var iconMap = {
-	clearday: CLEAR_DAY,
-	clearnight: CLEAR_NIGHT,
-	rain: RAIN,
-	snow: SNOW,
-	sleet: SNOW,
-	wind: WINDY,
-	fog: HAZE,
-	cloudy: CLOUDY,
-	partlycloudyday: PARTLY_CLOUDY_DAY,
-	partlycloudynight: PARTLY_CLOUDY_NIGHT
+function getIcon(id, dayBool)
+{
+	var category = id[0];
+	
+	switch(category){
+		case "2":
+			return STORM;
+		case "3":
+		case "5":
+			return RAIN;
+		case "6":
+			return SNOW;
+		case "7":
+			return HAZE;
+		case "8":
+			if(id == "800")
+			{
+				return (dayBool ? CLEAR_DAY : CLEAR_NIGHT);
+			}
+			if(id == "801" || id == "802")
+			{
+				return (dayBool ? PARTLY_CLOUDY_DAY : PARTLY_CLOUDY_NIGHT);
+			}
+			return CLOUD;
+	}
+		
 }
 
 var options = JSON.parse(localStorage.getItem('options'));
@@ -48,10 +63,11 @@ if (options === null) options = { "use_gps" : "true",
 function getWeatherFromLatLong(latitude, longitude) {
   console.log(latitude + ", " + longitude);
   var forecastReq = new XMLHttpRequest();
-  var unitsCode = "auto"
-  if (options.units == "fahrenheit") unitsCode = "us"
-  else if (options.units == "celsius") unitsCode = "si"
-  var forecastUrl = "https://api.darksky.net/forecast/" + API_KEY + "/" + latitude + "," + longitude + "?units=" + unitsCode;
+  
+  var unitsCode = "auto";
+  if (options.units == "fahrenheit") unitsCode = "imperial"
+  else if (options.units == "celsius") unitsCode = "metric"
+  var forecastUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" + latitude + "&lon=" + longitude + "&units=" + unitsCode + "&appid=" + API_KEY;
   forecastReq.open('GET', forecastUrl, true);
   forecastReq.onload = function(e)
   {
@@ -71,15 +87,24 @@ function getWeatherFromLatLong(latitude, longitude) {
 
 function getWeatherForecastIO(data)
 {
-	var temp = data.currently.temperature;
+	var temp = data.main.temp;
 	console.log("TEMP: " + temp);
-	var icon = data.currently.icon.replace(/-/g, "");
+	console.log(data.weather[0].id);
+	
+	var time = data.dt;
+	var sunrise = data.sys.sunrise;
+	var sunset = data.sys.sunset;
+	
+	var dayBool = time > sunrise && time < sunset;
+	
+	var icon = getIcon(data.weather[0].id.toString(), dayBool);
 	Pebble.sendAppMessage({
-		"icon" : iconMap[icon],
+		"icon" : icon,
 		"temperature" : Math.round(temp) + "\u00B0",
 		"invert_color" : (options.invert_color == "true" ? 1 : 0),
 	});
 }
+	
 
 var locationOptions = {
   "timeout": 15000,

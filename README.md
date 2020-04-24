@@ -1,7 +1,7 @@
 # renowatch-pebble-modified
 Modified pebble-js-app file for reno pebble watchfaces
 
-Requires a free API key from https://darksky.net/dev/account
+Requires a free API key from https://openweathermap.org/
 
 To modify an original PBW file in Windows, edit the pebble-js-app.js and enter your API key.  Then, open the file in 7-zip, and drag and drop the new file into the archive.
 
