@@ -101,6 +101,32 @@ function getWeatherFromLatLong(latitude, longitude) {
   return;
 }
 
+function getWeatherFromLocation(location) {
+  console.log(location);
+  var forecastReq = new XMLHttpRequest();
+  
+  var unitsCode = "auto";
+  if (options.units == "fahrenheit") unitsCode = "imperial"
+  else if (options.units == "celsius") unitsCode = "metric"
+  
+  var forecastUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + location + "&units=" + unitsCode + "&appid=" + API_KEY;
+  forecastReq.open('GET', forecastUrl, true);
+  forecastReq.onload = function(e)
+  {
+	  //console.log(e.status);
+	  if(forecastReq.status == 200)
+	  {
+		  var data = JSON.parse(forecastReq.responseText);
+		  if(data)
+		  {
+			  getWeatherForecastIO(data);
+		  }
+	  }
+  }
+  forecastReq.send(null);
+  return;
+}
+
 function getWeatherForecastIO(data)
 {
 	var temp = data.main.temp;
@@ -130,9 +156,14 @@ var locationOptions = {
 };
 
 function updateWeather() {
-	navigator.geolocation.getCurrentPosition(locationSuccess,
+	if (options.location === null || options.location === "") {
+		navigator.geolocation.getCurrentPosition(locationSuccess,
                                                     locationError,
                                                     locationOptions);
+	}
+	else {
+		getWeatherFromLocation(options.location);
+	}
 }
 
 function locationSuccess(pos) {
