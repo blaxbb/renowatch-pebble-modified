@@ -1,3 +1,7 @@
+# OBSOLETE
+
+The original author has updated the packages on the Rebble store.  You can now just install like a normal watchface and use an OpenWeatherMap API key to activate.
+
 # renowatch-pebble-modified
 Modified pebble-js-app file for reno pebble watchfaces
 
